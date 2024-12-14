@@ -1,67 +1,44 @@
-import { useState, useEffect } from 'react';
-import Timer from './components/Timer';
-import TypingArea from './components/TypingArea';
-import Results from './components/Results';
+import { useState } from 'react';
+import Timer from './components/Timer';  // Assuming Timer is in the same directory
+import TypingArea from './components/TypingArea';  // Assuming TypingArea is in the same directory
+import Results from './components/Results';  // Assuming Results is in the same directory
 
 export default function Home() {
-  const [textToType, setTextToType] = useState('Type this sentence as fast as you can!');
-  const [inputValue, setInputValue] = useState('');
-  const [startTime, setStartTime] = useState(null);
-  const [testStarted, setTestStarted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(60);
+  const [userInput, setUserInput] = useState('');
+  const [timerFinished, setTimerFinished] = useState(false);
   const [wordsPerMinute, setWordsPerMinute] = useState(0);
   const [accuracy, setAccuracy] = useState(0);
 
-  const calculateResults = () => {
-    const wordCount = inputValue.trim().split(/\s+/).length;
-    const timeSpent = 60 - timeLeft;
-    setWordsPerMinute(Math.round(wordCount / (timeSpent / 60)));
-
-    const correctWords = inputValue.split(' ').filter((word, index) => word === textToType.split(' ')[index]).length;
-    setAccuracy(Math.round((correctWords / wordCount) * 100));
-  };
-
-  useEffect(() => {
-    if (testStarted && timeLeft > 0) {
-      const timer = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
-
-      return () => clearInterval(timer);
-    } else if (timeLeft === 0) {
-      calculateResults();
-    }
-  }, [timeLeft, testStarted]);
-
-  const handleStartTest = () => {
-    setTestStarted(true);
-    setStartTime(Date.now());
-  };
+  const textToType = 'The quick brown fox jumps over the lazy dog.';
 
   const handleInputChange = (e) => {
-    setInputValue(e.target.value);
-    if (!testStarted) {
-      handleStartTest();
-    }
+    setUserInput(e.target.value);
+  };
+
+  const handleTimerEnd = () => {
+    setTimerFinished(true);
+    
+    // Calculate Words Per Minute (WPM) and Accuracy
+    const totalWords = textToType.split(' ').length;
+    const typedWords = userInput.split(' ').length;
+    const wpm = Math.floor((typedWords / 5) / (60 / 60));  // Assuming 5 characters per word
+    const accuracy = ((typedWords / totalWords) * 100).toFixed(2);
+
+    setWordsPerMinute(wpm);
+    setAccuracy(accuracy);
   };
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <h1 className="text-4xl font-semibold text-center mb-6">Typing Speed Test</h1>
-      {!testStarted && (
-        <button
-          onClick={handleStartTest}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg mx-auto block"
-        >
-          Start Test
-        </button>
-      )}
-      <Timer duration={60} onEnd={calculateResults} />
-      {testStarted && (
+    <div className="container mx-auto">
+      <h1 className="text-3xl font-bold text-center mt-6">Typing Speed Test</h1>
+      
+      {!timerFinished ? (
         <>
-          <TypingArea textToType={textToType} onInputChange={handleInputChange} />
-          {timeLeft === 0 && <Results wordsPerMinute={wordsPerMinute} accuracy={accuracy} />}
+          <Timer duration={60} onEnd={handleTimerEnd} />
+          <TypingArea textToType={textToType} userInput={userInput} onInputChange={handleInputChange} />
         </>
+      ) : (
+        <Results wordsPerMinute={wordsPerMinute} accuracy={accuracy} />
       )}
     </div>
   );
