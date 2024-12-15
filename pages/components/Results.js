@@ -1,15 +1,17 @@
-// Results.js
-const Results = ({ wordsPerMinute, accuracy }) => {
-    const formattedWPM = wordsPerMinute ? wordsPerMinute.toFixed(2) : 0;
-    const formattedAccuracy = accuracy ? accuracy.toFixed(2) : 0;
-  
+const Results = ({ wordsPerMinute, accuracy, onRestart }) => {
     return (
       <div className="mt-6 text-center">
-        <p className="text-2xl font-semibold mb-2">Speed: {formattedWPM} WPM</p>
-        <p className="text-xl">Accuracy: {formattedAccuracy}%</p>
+        <p className="text-2xl font-semibold">Speed: {wordsPerMinute} WPM</p>
+        <p className="text-xl">Accuracy: {accuracy}%</p>
+        <button
+          className="mt-4 p-2 bg-blue-500 text-white rounded"
+          onClick={onRestart}
+        >
+          Restart
+        </button>
       </div>
     );
   };
   
-  export default Results;  // Ensure default export
+  export default Results;
   
