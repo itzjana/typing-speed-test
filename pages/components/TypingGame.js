@@ -1,42 +1,40 @@
 import { useState, useEffect } from 'react';
-import Timer from './Timer';  // Timer component
-import TypingArea from './TypingArea';  // TypingArea component
-import Results from './Results';  // Results component
+import Timer from './Timer';
+import TypingArea from './TypingArea';
+import Results from './Results';
 
 const TypingGame = () => {
-  const text = 'The quick brown fox jumps over the lazy dog'.split(' '); // Split sentence into words
+  const text = 'The quick brown fox jumps over the lazy dog. As the sun sets behind the mountains, the birds soar high in the sky, singing melodies that echo through the valley. The river flows gently, weaving its way around rocks and trees, while the wind whispers through the branches of the ancient oaks. A small rabbit hops along the edge of the forest, pausing to nibble on some tender grass. Farther in the distance, the city lights begin to twinkle, marking the end of another peaceful day in the countryside. It is a world of harmony, where nature and civilization coexist in quiet balance, and every day offers a new adventure waiting to be discovered.'.split(' ');
   const [userInput, setUserInput] = useState('');
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [correctWordsCount, setCorrectWordsCount] = useState(0);
-  const [typedWordsCount, setTypedWordsCount] = useState(0); // Total words typed (both correct and incorrect)
+  const [typedWordsCount, setTypedWordsCount] = useState(0);
   const [timerFinished, setTimerFinished] = useState(false);
   const [wordsPerMinute, setWordsPerMinute] = useState(0);
   const [accuracy, setAccuracy] = useState(0);
-  const [timeElapsed, setTimeElapsed] = useState(0); // Track time elapsed for WPM calculation
-  const [startTime, setStartTime] = useState(null); // Timer start time
-  const [gameActive, setGameActive] = useState(true); // Track if game is still active
-  const [currentWord, setCurrentWord] = useState(text[currentWordIndex]); // Current word to type
-  const [history, setHistory] = useState([]); // Score history
-  const [typingAllowed, setTypingAllowed] = useState(false); // Control if typing is allowed
+  const [timeElapsed, setTimeElapsed] = useState(0);
+  const [startTime, setStartTime] = useState(null);
+  const [gameActive, setGameActive] = useState(true);
+  const [currentWord, setCurrentWord] = useState(text[currentWordIndex]);
+  const [history, setHistory] = useState([]);
+  const [typingAllowed, setTypingAllowed] = useState(false);
 
-  // Update the current word whenever currentWordIndex changes
   useEffect(() => {
     if (currentWordIndex < text.length) {
       setCurrentWord(text[currentWordIndex]);
     }
   }, [currentWordIndex, text]);
 
-  // Handle word change when current word is typed correctly
   useEffect(() => {
     if (userInput.trim() === currentWord) {
-      setCorrectWordsCount((prevCount) => prevCount + 1);  // Increment correct words count
-      setTypedWordsCount((prevCount) => prevCount + 1);    // Increment total typed words count (correct or incorrect)
+      setCorrectWordsCount((prevCount) => prevCount + 1);
+      setTypedWordsCount((prevCount) => prevCount + 1);
       if (currentWordIndex < text.length - 1) {
-        setCurrentWordIndex((prevIndex) => prevIndex + 1);  // Move to next word
+        setCurrentWordIndex((prevIndex) => prevIndex + 1);
       }
-      setUserInput(''); // Clear input field for the next word
+      setUserInput('');
     } else if (userInput.trim() !== '') {
-      setTypedWordsCount((prevCount) => prevCount + 1);  // Increment total typed words count on incorrect typing
+      setTypedWordsCount((prevCount) => prevCount + 1);
     }
   }, [userInput, currentWord, currentWordIndex]);
 
@@ -46,16 +44,12 @@ const TypingGame = () => {
 
   const handleTimerEnd = () => {
     setTimerFinished(true);
-    // Calculate Words Per Minute (WPM) based on time and correct words typed
-    const wpm = Math.floor((correctWordsCount / timeElapsed) * 60); // Total correct words / time in minutes
-
-    // Calculate Accuracy based on correct words typed and total words typed
+    const wpm = Math.floor((correctWordsCount / timeElapsed) * 60);
     const accuracy = ((correctWordsCount / typedWordsCount) * 100).toFixed(2);
 
     setWordsPerMinute(wpm);
     setAccuracy(accuracy);
 
-    // Add result to history
     setHistory((prevHistory) => [
       ...prevHistory,
       { wpm, accuracy, time: new Date().toLocaleString() },
@@ -64,16 +58,13 @@ const TypingGame = () => {
 
   const handleAbort = () => {
     setGameActive(false);
-    setTimerFinished(true); // Mark the game as finished
-    
-    // Calculate Words Per Minute (WPM) and Accuracy based on the words typed so far
-    const wpm = Math.floor((typedWordsCount / 60) * 60); // Use the number of words typed divided by 1 minute (since we calculate WPM for 60 seconds)
-    const accuracy = ((correctWordsCount / typedWordsCount) * 100).toFixed(2); // Accuracy based on the words typed so far
+    setTimerFinished(true);
+    const wpm = Math.floor((typedWordsCount / 60) * 60);
+    const accuracy = ((correctWordsCount / typedWordsCount) * 100).toFixed(2);
 
     setWordsPerMinute(wpm);
     setAccuracy(accuracy);
 
-    // Save the result to history
     setHistory((prevHistory) => [
       ...prevHistory,
       { wpm, accuracy, time: new Date().toLocaleString() },
@@ -92,78 +83,83 @@ const TypingGame = () => {
     setTimeElapsed(0);
     setGameActive(true);
     setStartTime(null);
-    setTypingAllowed(false); // Disable typing until timer starts
+    setTypingAllowed(false);
   };
 
   const handleStartTimer = () => {
     setStartTime(Date.now());
-    setTypingAllowed(true); // Allow typing once the timer starts
+    setTypingAllowed(true);
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold text-center mt-6">Typing Speed Test</h1>
+    <div className="min-h-screen bg-black text-white">
+      <div className="container mx-auto p-6">
+        <h1 className="text-4xl font-extrabold text-center mt-12 mb-8 text-transparent bg-clip-text bg-gradient-to-r from-gray-500 to-gray-300">
+          Typing Speed Test
+        </h1>
 
-      {!timerFinished ? (
-        <>
-          <Timer
-            duration={60}
-            onEnd={handleTimerEnd}
-            setTimeElapsed={setTimeElapsed}
-            startTime={startTime}
-            setStartTime={setStartTime}
+        {!timerFinished ? (
+          <>
+            <Timer
+              duration={60}
+              onEnd={handleTimerEnd}
+              setTimeElapsed={setTimeElapsed}
+              startTime={startTime}
+              setStartTime={setStartTime}
+            />
+            <TypingArea
+              textToType={currentWord}
+              userInput={userInput}
+              onInputChange={handleInputChange}
+              typingAllowed={typingAllowed}
+            />
+            {gameActive && (
+              <div className="flex mt-6 space-x-6 justify-center">
+                <button
+                  className="px-8 py-4 bg-gray-600 text-white font-semibold rounded-lg shadow-lg transform transition-all hover:scale-105 hover:translate-y-1"
+                  onClick={handleStartTimer}
+                  disabled={startTime !== null}
+                >
+                  Start Timer
+                </button>
+                <button
+                  className="px-8 py-4 bg-red-600 text-white font-semibold rounded-lg shadow-lg transform transition-all hover:scale-105 hover:translate-y-1"
+                  onClick={handleAbort}
+                >
+                  Abort
+                </button>
+              </div>
+            )}
+          </>
+        ) : (
+          <Results
+            wordsPerMinute={wordsPerMinute}
+            accuracy={accuracy}
+            onRestart={handleRestart}
           />
-          <TypingArea
-            textToType={currentWord}  // Show the current word to type
-            userInput={userInput}
-            onInputChange={handleInputChange}
-            typingAllowed={typingAllowed}  // Enable/disable input based on timer
-          />
-          {gameActive && (
-            <div className="flex mt-4 space-x-4 justify-center">
-              <button
-                className="p-2 bg-blue-500 text-white rounded"
-                onClick={handleStartTimer}
-                disabled={startTime !== null} // Disable if timer already started
-              >
-                Start Timer
-              </button>
-              <button
-                className="p-2 bg-red-500 text-white rounded"
-                onClick={handleAbort}
-              >
-                Abort
-              </button>
-            </div>
-          )}
-        </>
-      ) : (
-        <Results
-          wordsPerMinute={wordsPerMinute}
-          accuracy={accuracy}
-          onRestart={handleRestart}
-        />
-      )}
+        )}
 
-      {/* Display history */}
-      <div className="mt-6">
-        <h2 className="text-2xl font-semibold">Score History</h2>
-        <div className="mt-4">
-          {history.length === 0 ? (
-            <p>No previous scores</p>
-          ) : (
-            <ul>
-              {history.map((entry, index) => (
-                <li key={index} className="mb-2">
-                  <span className="font-bold">Score {index + 1}:</span>
-                  <br />
-                  <span>Speed: {entry.wpm} WPM | Accuracy: {entry.accuracy}%</span>
-                  <br />
-                  <span className="text-gray-500">Time: {entry.time}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+        <div className="mt-12">
+          <h2 className="text-3xl font-semibold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-gray-500 to-gray-300">
+            Score History
+          </h2>
+          <div className="max-w-4xl mx-auto">
+            {history.length === 0 ? (
+              <p className="text-center text-xl">No previous scores</p>
+            ) : (
+              <ul className="space-y-4">
+                {history.map((entry, index) => (
+                  <li key={index} className="bg-gray-800 p-4 rounded-lg shadow-lg">
+                    <span className="font-bold text-lg">Score {index + 1}:</span>
+                    <br />
+                    <span className="text-xl">Speed: {entry.wpm} WPM | Accuracy: {entry.accuracy}%</span>
+                    <br />
+                    <span className="text-gray-400">{entry.time}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </div>
